@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { createCompany } from "@/lib/api"; 
 
 export default function CompanyForm() {
   const router = useRouter();
@@ -14,29 +14,23 @@ export default function CompanyForm() {
     size: "",
     location: "",
     founded_year: "",
-    social_links: [{ platform: "", url: "" }], // <-- One empty social link by default
+    social_links: [{ platform: "", url: "" }],
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Handle input changes for main fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Handle social links change (platform or url)
   const handleSocialLinkChange = (index, field, value) => {
     const updatedLinks = [...formData.social_links];
     updatedLinks[index][field] = value;
     setFormData({ ...formData, social_links: updatedLinks });
   };
 
-  // Add new empty social link input
   const addSocialLink = () => {
     setFormData({
       ...formData,
@@ -44,20 +38,17 @@ export default function CompanyForm() {
     });
   };
 
-  // Remove social link input by index
   const removeSocialLink = (index) => {
     const updatedLinks = [...formData.social_links];
     updatedLinks.splice(index, 1);
     setFormData({ ...formData, social_links: updatedLinks });
   };
 
-  // Submit form to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
-    // Convert social_links array to object with keys as platform names
     const socialLinksObject = formData.social_links.reduce((acc, link) => {
       if (link.platform && link.url) {
         acc[link.platform] = link.url;
@@ -77,10 +68,7 @@ export default function CompanyForm() {
     };
 
     try {
-      await axios.post(
-        "https://drona-job-portal-be.onrender.com/api/company/create",
-        payload
-      );
+      await createCompany(payload);
       setMessage("✅ Company created successfully!");
       setFormData({
         name: "",
@@ -90,11 +78,9 @@ export default function CompanyForm() {
         size: "",
         location: "",
         founded_year: "",
-        social_links: [{ platform: "", url: "" }], // Reset to one empty social link again
+        social_links: [{ platform: "", url: "" }],
       });
-
-      // Redirect to dashboard after success
-      router.push("/dashboard");
+      router.push("/recruiter/dashboard");
     } catch (error) {
       console.error(error);
       setMessage("❌ Failed to create company");
@@ -111,7 +97,7 @@ export default function CompanyForm() {
           radial-gradient(circle at top left, #A5E3FF 0%, transparent 40%),
           radial-gradient(circle at bottom right, #A5E3FF 0%, transparent 40%)
         `,
-     }}
+      }}
     >
       <form
         onSubmit={handleSubmit}
@@ -152,12 +138,9 @@ export default function CompanyForm() {
           </div>
         ))}
 
-        {/* Social Links Section */}
+        {/* Social Links */}
         <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">
-            Social Links
-          </label>
-
+          <label className="block text-gray-700 font-medium mb-2">Social Links</label>
           {formData.social_links.map((link, index) => (
             <div key={index} className="flex space-x-2 mb-2 items-center">
               <input
@@ -185,7 +168,7 @@ export default function CompanyForm() {
                 onClick={() => removeSocialLink(index)}
                 className="text-red-600 font-bold px-2 py-1 rounded hover:bg-red-100"
                 title="Remove social link"
-                disabled={formData.social_links.length === 1} // Disable remove if only 1 left
+                disabled={formData.social_links.length === 1}
               >
                 ×
               </button>

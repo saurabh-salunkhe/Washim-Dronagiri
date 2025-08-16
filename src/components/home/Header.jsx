@@ -39,9 +39,9 @@ const Header = () => {
             <Link href="/jobseeker/auth/login" className="text-gray-700 hover:text-blue-600 font-medium">
               Login
             </Link>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium">
+            <Link href="/recruiter/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium">
               login as Recruiter
-            </button>
+            </Link>
           </div>
         </div>
       </div>
